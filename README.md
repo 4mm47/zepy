@@ -200,8 +200,6 @@ python main.py rules
 
 Launch the desktop interface with `python main.py gui`.
 
-<img src="assets/gui.png" alt="GUI" width="240"/>
-
 ---
 
 ## 🛡️ Supported Vulnerability Matrix
