@@ -200,28 +200,7 @@ python main.py rules
 
 Launch the desktop interface with `python main.py gui`.
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ [ZEPY]  ZEPY AI-SHIELD v1.0.0                      ● ENGINE ACTIVE (50+ Rules)│
-├─────────────────────────────────────────────────────────────────────────────┤
-│ [📁 Codebase & File Scanner]  [⚡ Live Prompt Tester]  [🛡️ Rules Catalog]    │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ Target: [ C:\Projects\MyAIApp           ] [Browse] [⚡ START AUDIT]         │
-│ Score: 35.0/100  | Critical: 4  | High: 3  | Med: 2  | Low: 1               │
-├────────────────────────────────┬────────────────────────────────────────────┤
-│ Findings Table                 │ Source Code Inspector (Line Highlighted)   │
-│ ────────────────────────────── │ ────────────────────────────────────────── │
-│ [CRITICAL] Insecure torch.load │  35 | def load_checkpoint(file):           │
-│ [CRITICAL] eval(llm_response)  │  36 | >   return torch.load(file)          │
-│ [HIGH] Exposed OpenAI API Key  │  37 |                                      │
-│ [HIGH] Prompt Template Inject  │ ────────────────────────────────────────── │
-│                                │ Remediation Advisor (CWE-502 / LLM05):     │
-│                                │ Use torch.load(..., weights_only=True) or  │
-│                                │ convert model weights to safetensors.      │
-├────────────────────────────────┴────────────────────────────────────────────┤
-│ [🌐 Open Interactive HTML Report]  [💾 Export JSON]  [📊 Export CSV]         │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+<img src="assets/gui.png" alt="ZEPY AI Vulnerability Scanner Logo" width="240" style="border-radius: 16px; box-shadow: 0 8px 32px rgba(5, 217, 232, 0.3);" />
 
 ---
 
