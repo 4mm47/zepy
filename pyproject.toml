@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zepy-security"
+version = "1.0.0"
+description = "Advanced AI & LLM Static Application Security Testing (SAST) & Prompt Vulnerability Detection Framework"
+readme = "README.md"
+authors = [{ name = "ZEPY Security Research" }]
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = [
+    "rich>=13.0.0",
+    "PyQt5>=5.15.0",
+    "safetensors>=0.4.0",
+    "pydantic>=2.0.0",
+    "PyYAML>=6.0.0",
+]
+
+[project.scripts]
+zepy-scan = "zepy.cli:main"
+zepy-gui = "zepy.gui.app:run_gui"
+zepy-shield = "zepy.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/4mm47/zepy"
+Documentation = "https://github.com/4mm47/zepy#readme"
+Repository = "https://github.com/4mm47/zepy.git"
+Issues = "https://github.com/4mm47/zepy/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["zepy*"]

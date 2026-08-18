@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZEPY AI Vulnerability Report [RARE]</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #090D16;
+            --surface: #121824;
+            --surface-border: #1E293B;
+            --text: #F8FAFC;
+            --text-dim: #94A3B8;
+            --rare-crimson: #FF2A6D;
+            --rare-orange: #FF5E00;
+            --rare-amber: #FFB800;
+            --rare-cyan: #05D9E8;
+            --rare-mint: #01FFC3;
+            --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 30px 20px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        /* Header & Banner */
+        .header {
+            background: linear-gradient(135deg, rgba(255,42,109,0.12) 0%, rgba(5,217,232,0.08) 100%);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 24px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .logo-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .badge-rare {
+            background: var(--rare-crimson);
+            color: #fff;
+            padding: 4px 10px;
+            font-weight: 800;
+            font-size: 14px;
+            border-radius: 6px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .app-name {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #FFFFFF, var(--rare-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .meta-text {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+        /* Metric Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--rare-cyan);
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* Charts & Breakdown Section */
+        .visual-section {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-box {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-box h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: var(--text-dim);
+        }
+        .summary-box {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .summary-box h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: var(--rare-cyan);
+        }
+        .summary-box p {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        /* Filter & Search Bar */
+        .filter-bar {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            background: var(--bg);
+            border: 1px solid var(--surface-border);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 250px;
+            font-size: 14px;
+        }
+        .filter-btn {
+            background: var(--surface-border);
+            border: none;
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .filter-btn.active {
+            background: var(--rare-cyan);
+            color: #000;
+        }
+        /* Findings Table & Accordion */
+        .finding-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .finding-card:hover {
+            border-color: #334155;
+        }
+        .finding-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+        .finding-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sev-tag {
+            font-weight: 800;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .sev-CRITICAL { background: rgba(255,42,109,0.2); color: var(--rare-crimson); border: 1px solid var(--rare-crimson); }
+        .sev-HIGH { background: rgba(255,94,0,0.2); color: var(--rare-orange); border: 1px solid var(--rare-orange); }
+        .sev-MEDIUM { background: rgba(255,184,0,0.2); color: var(--rare-amber); border: 1px solid var(--rare-amber); }
+        .sev-LOW { background: rgba(5,217,232,0.2); color: var(--rare-cyan); border: 1px solid var(--rare-cyan); }
+        .sev-INFO { background: rgba(1,255,195,0.2); color: var(--rare-mint); border: 1px solid var(--rare-mint); }
+
+        .finding-title {
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .finding-location {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--rare-cyan);
+        }
+        .finding-body {
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid var(--surface-border);
+            background: rgba(0,0,0,0.2);
+            display: block;
+        }
+        .finding-desc {
+            margin-top: 14px;
+            font-size: 14px;
+            color: #CBD5E1;
+        }
+        .code-snippet {
+            background: #030712;
+            border: 1px solid #1F2937;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            margin-top: 12px;
+            color: #E2E8F0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .remediation-box {
+            background: rgba(1, 255, 195, 0.05);
+            border-left: 4px solid var(--rare-mint);
+            padding: 12px 16px;
+            border-radius: 0 6px 6px 0;
+            margin-top: 14px;
+            font-size: 13px;
+        }
+        .remediation-title {
+            font-weight: 700;
+            color: var(--rare-mint);
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <div class="logo-title">
+                    <span class="badge-rare">RARE</span>
+                    <h1 class="app-name">ZEPY AI Vulnerability Auditor</h1>
+                </div>
+                <div class="meta-text">Target: <strong>zepy/tests/samples</strong> • Generated on 2026-08-18T23:27:40.357490</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 12px; color: var(--text-dim);">SECURITY POSTURE SCORE</div>
+                <div style="font-size: 38px; font-weight: 900; color: #FF2A6D;">0.0 <span style="font-size: 18px; color: var(--text-dim);">/ 100</span></div>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" style="color: var(--rare-crimson);">6</div>
+                <div class="metric-label">Critical Risks</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="color: var(--rare-orange);">3</div>
+                <div class="metric-label">High Risks</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="color: var(--rare-amber);">0</div>
+                <div class="metric-label">Medium Risks</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="color: var(--rare-cyan);">0</div>
+                <div class="metric-label">Low Risks</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="color: #fff;">2</div>
+                <div class="metric-label">Files Scanned</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="color: #fff;">0.01s</div>
+                <div class="metric-label">Audit Duration</div>
+            </div>
+        </div>
+
+        <div class="visual-section">
+            <div class="chart-box">
+                <h3>Severity Distribution</h3>
+                <canvas id="sevChart" width="220" height="220"></canvas>
+            </div>
+            <div class="summary-box">
+                <h3>⚡ RARE Executive Security Assessment</h3>
+                <p>
+                    The scan analyzed <strong>2 files</strong> (108 lines) and identified <strong>9 security issues</strong>.
+                    Immediate remediation is required for Critical and High severity findings to prevent potential remote code execution or model credential exposure.
+                </p>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search findings by rule ID, title, file path, CWE..." onkeyup="renderFindings()">
+            <button class="filter-btn active" onclick="setSeverityFilter('ALL', this)">ALL (9)</button>
+            <button class="filter-btn" onclick="setSeverityFilter('CRITICAL', this)">Critical (6)</button>
+            <button class="filter-btn" onclick="setSeverityFilter('HIGH', this)">High (3)</button>
+            <button class="filter-btn" onclick="setSeverityFilter('MEDIUM', this)">Medium (0)</button>
+            <button class="filter-btn" onclick="setSeverityFilter('LOW', this)">Low (0)</button>
+        </div>
+
+        <div id="findingsContainer"></div>
+    </div>
+
+    <script>
+        const findings = [{"id": "SEC-KEY-001-14-14", "title": "Hardcoded OpenAI API Key Detected", "category": "Hardcoded AI Secrets & Credentials", "severity": "CRITICAL", "description": "Found hardcoded OpenAI API key matching 'sk-[a-zA-Z0-9]{32,}'. Committing API keys to repositories enables unauthorized account access, quota theft, and data exfiltration. (Matched: sk-pro...8127)", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 14, "column_number": 15, "code_snippet": "  12   \n  13   # 1. Hardcoded API Secret (CWE-798 / LLM06)\n  14 > OPENAI_KEY = \"sk-proj-984719283749812739812739812739129847192837498127\"\n  15   client = OpenAI(api_key=OPENAI_KEY)\n  16   ", "remediation": "Store API keys in environment variables or secure secret managers (e.g. AWS Secrets Manager, Vault). Load via os.environ.get('OPENAI_API_KEY') and revoke exposed keys immediately.", "cwe_id": "CWE-798", "owasp_id": "LLM06:2025-Sensitive-Info-Disclosure", "confidence": 0.92, "metadata": {"detector": "regex_detector", "rule_id": "SEC-KEY-001", "match": "sk-pro...8127"}}, {"id": "AST-LLMOUT-001-32", "title": "Direct Execution of Untrusted AI/LLM Output", "category": "LLM02: Insecure Output Handling", "severity": "CRITICAL", "description": "Detected execution of LLM generation response content via eval, exec, or system shell. Large Language Models can be manipulated via indirect prompt injection to output malicious code that the host application will blindly execute.", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 32, "column_number": 4, "code_snippet": "  30   # 5. Direct Execution of LLM Output (RCE / Insecure Output - CWE-94 / LLM02)\n  31   def execute_ai_generated_code(ai_response):\n  32 >     eval(ai_response)\n  33       exec(ai_response)\n  34   ", "remediation": "Never execute raw LLM responses directly. Implement strict output parsing schemas (e.g. JSON schema / Pydantic), and run generated code only inside isolated ephemeral sandboxes.", "cwe_id": "CWE-94", "owasp_id": "LLM02:2025-Insecure-Output-Handling", "confidence": 0.98, "metadata": {"detector": "ast_detector", "rule_id": "AST-LLMOUT-001"}}, {"id": "AST-LLMOUT-001-33", "title": "Direct Execution of Untrusted AI/LLM Output", "category": "LLM02: Insecure Output Handling", "severity": "CRITICAL", "description": "Detected execution of LLM generation response content via eval, exec, or system shell. Large Language Models can be manipulated via indirect prompt injection to output malicious code that the host application will blindly execute.", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 33, "column_number": 4, "code_snippet": "  31   def execute_ai_generated_code(ai_response):\n  32       eval(ai_response)\n  33 >     exec(ai_response)\n  34   \n  35   # 6. Unsafe PyTorch Model Deserialization (CWE-502 / LLM05)", "remediation": "Never execute raw LLM responses directly. Implement strict output parsing schemas (e.g. JSON schema / Pydantic), and run generated code only inside isolated ephemeral sandboxes.", "cwe_id": "CWE-94", "owasp_id": "LLM02:2025-Insecure-Output-Handling", "confidence": 0.98, "metadata": {"detector": "ast_detector", "rule_id": "AST-LLMOUT-001"}}, {"id": "AST-DESER-002-37", "title": "Insecure PyTorch torch.load() without weights_only=True", "category": "AI Deserialization & Unsafe Model Loading", "severity": "CRITICAL", "description": "torch.load() called without weights_only=True. Enables arbitrary code execution from malicious AI checkpoints.", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 37, "column_number": 14, "code_snippet": "  35   # 6. Unsafe PyTorch Model Deserialization (CWE-502 / LLM05)\n  36   def load_ai_checkpoint(checkpoint_path):\n  37 >     weights = torch.load(checkpoint_path)  # Missing weights_only=True\n  38       return weights\n  39   ", "remediation": "Set 'weights_only=True' in torch.load(..., weights_only=True) or convert the model to the 'safetensors' format.", "cwe_id": "CWE-502", "owasp_id": "LLM05:2025-Supply-Chain", "confidence": 0.98, "metadata": {"detector": "ast_detector", "rule_id": "AST-DESER-002"}}, {"id": "AST-DESER-001-43", "title": "Unsafe Pickle Deserialization in AI Model Pipeline", "category": "AI Deserialization & Unsafe Model Loading", "severity": "CRITICAL", "description": "Detected call to pickle.loads() or pickle.load(). Serialized pickle streams can execute arbitrary Python code upon deserialization via the __reduce__ method. Malicious model checkpoints distributed online often leverage this for Remote Code Execution (RCE).", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 43, "column_number": 15, "code_snippet": "  41   def load_custom_pipeline(pipeline_file):\n  42       with open(pipeline_file, \"rb\") as f:\n  43 >         return pickle.load(f)\n  44   \n  45   # 8. Unsafe YAML Deserialization (CWE-502 / LLM05)", "remediation": "Use safe serialization formats such as 'safetensors' (from HuggingFace) or JSON/ONNX for model weights. Never load untrusted pickle files from unauthenticated sources.", "cwe_id": "CWE-502", "owasp_id": "LLM05:2025-Supply-Chain", "confidence": 0.98, "metadata": {"detector": "ast_detector", "rule_id": "AST-DESER-001"}}, {"id": "AST-DESER-004-48", "title": "Insecure YAML Deserialization (yaml.load without SafeLoader)", "category": "AI Deserialization & Unsafe Model Loading", "severity": "CRITICAL", "description": "Detected unsafe yaml.load() or yaml.unsafe_load(). Unsafe YAML loaders can instantiate arbitrary Python objects leading to remote command execution.", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 48, "column_number": 15, "code_snippet": "  46   def load_config(config_file):\n  47       with open(config_file, \"r\") as f:\n  48 >         return yaml.load(f, Loader=yaml.Loader)\n  49   \n  50   # 9. Insecure Plaintext HTTP Model Download (CWE-319 / LLM05)", "remediation": "Always use 'yaml.safe_load()' or pass 'Loader=yaml.SafeLoader'.", "cwe_id": "CWE-502", "owasp_id": "LLM05:2025-Supply-Chain", "confidence": 0.98, "metadata": {"detector": "ast_detector", "rule_id": "AST-DESER-004"}}, {"id": "SEC-PROMPT-002-18-0", "title": "Hardcoded Sensitive Credentials / Internal PII inside System Prompt", "category": "LLM06: Sensitive Information Disclosure", "severity": "HIGH", "description": "System prompts contain hardcoded passwords, internal database schemas, or proprietary company secrets. System prompts are easily extracted through jailbreak and prompt leakage techniques. (Matched: system_prompt = \"You are a customer bot. Internal database password is secret_root_pass_999!\")", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 18, "column_number": 1, "code_snippet": "  16   \n  17   # 2. Hardcoded Credentials in System Prompt (CWE-200 / LLM06)\n  18 > system_prompt = \"You are a customer bot. Internal database password is secret_root_pass_999!\"\n  19   \n  20   # 3. Direct Prompt Template Interpolation (Prompt Injection Risk - CWE-20 / LLM01)", "remediation": "Do not include passwords, API tokens, or confidential employee data in system prompts.", "cwe_id": "CWE-200", "owasp_id": "LLM06:2025-Sensitive-Info-Disclosure", "confidence": 0.92, "metadata": {"detector": "regex_detector", "rule_id": "SEC-PROMPT-002", "match": "system_prompt = \"You are a customer bot. Internal database password is secret_root_pass_999!\""}}, {"id": "SEC-PROMPT-001-22-4", "title": "Direct Prompt Template String Interpolation (Prompt Injection Risk)", "category": "LLM01: Prompt Injection & Jailbreak", "severity": "HIGH", "description": "Detected raw f-string or format string directly inserting unvalidated user input into system instructions without boundary delimiters or prompt isolation. Attackers can provide payload strings like 'Ignore previous instructions...' to hijack model control flow. (Matched: prompt = f\"You are a helpful assistant. Follow this command: {user_input}\")", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 22, "column_number": 5, "code_snippet": "  20   # 3. Direct Prompt Template Interpolation (Prompt Injection Risk - CWE-20 / LLM01)\n  21   def generate_bot_response(user_input):\n  22 >     prompt = f\"You are a helpful assistant. Follow this command: {user_input}\"\n  23       # 4. Missing max_tokens limit (DoS Risk - CWE-400 / LLM04)\n  24       response = client.chat.completions.create(", "remediation": "Use structured message roles (e.g. system vs user role in ChatML) and enclose untrusted content in distinct XML/Markdown delimiters (e.g. <user_input>...</user_input>) while instructing the model to treat content inside as data only.", "cwe_id": "CWE-20", "owasp_id": "LLM01:2025-Prompt-Injection", "confidence": 0.92, "metadata": {"detector": "regex_detector", "rule_id": "SEC-PROMPT-001", "match": "prompt = f\"You are a helpful assistant. Follow this command: {user_input}\""}}, {"id": "SEC-NET-001-51-13", "title": "Insecure Plaintext HTTP Model Download / API Endpoint", "category": "Insecure Model Endpoint & Network Protocol", "severity": "HIGH", "description": "Detected plaintext 'http://' URL used for downloading model weights or communicating with an AI service. Plaintext transmissions are vulnerable to Man-In-The-Middle (MITM) tampering, allowing attackers to swap model weights with poisoned or trojanized checkpoints. (Matched: http://huggingface.co/org/model/weights.bin)", "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py", "line_number": 51, "column_number": 14, "code_snippet": "  49   \n  50   # 9. Insecure Plaintext HTTP Model Download (CWE-319 / LLM05)\n  51 > MODEL_URL = \"http://huggingface.co/org/model/weights.bin\"\n  52   \n  53   # 10. Unpinned Pretrained Model (LLM05)", "remediation": "Enforce HTTPS ('https://') with TLS certificate verification for all model downloads and API calls.", "cwe_id": "CWE-319", "owasp_id": "LLM05:2025-Supply-Chain", "confidence": 0.92, "metadata": {"detector": "regex_detector", "rule_id": "SEC-NET-001", "match": "http://huggingface.co/org/model/weights.bin"}}];
+        let activeSeverity = 'ALL';
+
+        function renderChart() {
+            const ctx = document.getElementById('sevChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Low', 'Info'],
+                    datasets: [{
+                        data: [6, 3, 0, 0, 0],
+                        backgroundColor: ['#FF2A6D', '#FF5E00', '#FFB800', '#05D9E8', '#01FFC3'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '72%'
+                }
+            });
+        }
+
+        function setSeverityFilter(sev, btn) {
+            activeSeverity = sev;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderFindings();
+        }
+
+        function renderFindings() {
+            const container = document.getElementById('findingsContainer');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = findings.filter(v => {
+                const matchesSev = (activeSeverity === 'ALL' || v.severity === activeSeverity);
+                const matchesSearch = !search || 
+                    v.title.toLowerCase().includes(search) || 
+                    v.id.toLowerCase().includes(search) ||
+                    v.file_path.toLowerCase().includes(search) ||
+                    (v.cwe_id && v.cwe_id.toLowerCase().includes(search)) ||
+                    (v.owasp_id && v.owasp_id.toLowerCase().includes(search));
+                return matchesSev && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-dim);">No matching vulnerabilities found.</div>';
+                return;
+            }
+
+            filtered.forEach((v, index) => {
+                const card = document.createElement('div');
+                card.className = 'finding-card';
+                card.innerHTML = `
+                    <div class="finding-header" onclick="toggleBody('body-${index}')">
+                        <div class="finding-title-group">
+                            <span class="sev-tag sev-${v.severity}">${v.severity}</span>
+                            <span class="finding-title">${v.title}</span>
+                        </div>
+                        <div class="finding-location">${v.file_path}:${v.line_number}</div>
+                    </div>
+                    <div id="body-${index}" class="finding-body">
+                        <div class="finding-desc">${v.description}</div>
+                        ${v.code_snippet ? `<div class="code-snippet">${escapeHtml(v.code_snippet)}</div>` : ''}
+                        <div class="remediation-box">
+                            <div class="remediation-title">🛡️ Remediation Strategy (${v.cwe_id || 'Security Fix'} • ${v.owasp_id || 'Standard'}):</div>
+                            <div>${v.remediation}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleBody(id) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        window.onload = function() {
+            renderChart();
+            renderFindings();
+        };
+    </script>
+</body>
+</html>

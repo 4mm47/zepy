@@ -1,0 +1,4 @@
+[console_scripts]
+zepy-gui = zepy.gui.app:run_gui
+zepy-scan = zepy.cli:main
+zepy-shield = zepy.cli:main

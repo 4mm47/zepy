@@ -1,0 +1,194 @@
+{
+  "target_path": "zepy/tests/samples",
+  "timestamp": "2026-08-18T23:27:40.357490",
+  "scanner_version": "2.4.0-RARE",
+  "metrics": {
+    "total_files_scanned": 2,
+    "total_lines_scanned": 108,
+    "scan_duration_seconds": 0.005,
+    "critical_count": 6,
+    "high_count": 3,
+    "medium_count": 0,
+    "low_count": 0,
+    "info_count": 0,
+    "security_score": 0.0
+  },
+  "findings_count": 9,
+  "findings": [
+    {
+      "id": "SEC-KEY-001-14-14",
+      "title": "Hardcoded OpenAI API Key Detected",
+      "category": "Hardcoded AI Secrets & Credentials",
+      "severity": "CRITICAL",
+      "description": "Found hardcoded OpenAI API key matching 'sk-[a-zA-Z0-9]{32,}'. Committing API keys to repositories enables unauthorized account access, quota theft, and data exfiltration. (Matched: sk-pro...8127)",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 14,
+      "column_number": 15,
+      "code_snippet": "  12   \n  13   # 1. Hardcoded API Secret (CWE-798 / LLM06)\n  14 > OPENAI_KEY = \"sk-proj-984719283749812739812739812739129847192837498127\"\n  15   client = OpenAI(api_key=OPENAI_KEY)\n  16   ",
+      "remediation": "Store API keys in environment variables or secure secret managers (e.g. AWS Secrets Manager, Vault). Load via os.environ.get('OPENAI_API_KEY') and revoke exposed keys immediately.",
+      "cwe_id": "CWE-798",
+      "owasp_id": "LLM06:2025-Sensitive-Info-Disclosure",
+      "confidence": 0.92,
+      "metadata": {
+        "detector": "regex_detector",
+        "rule_id": "SEC-KEY-001",
+        "match": "sk-pro...8127"
+      }
+    },
+    {
+      "id": "AST-LLMOUT-001-32",
+      "title": "Direct Execution of Untrusted AI/LLM Output",
+      "category": "LLM02: Insecure Output Handling",
+      "severity": "CRITICAL",
+      "description": "Detected execution of LLM generation response content via eval, exec, or system shell. Large Language Models can be manipulated via indirect prompt injection to output malicious code that the host application will blindly execute.",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 32,
+      "column_number": 4,
+      "code_snippet": "  30   # 5. Direct Execution of LLM Output (RCE / Insecure Output - CWE-94 / LLM02)\n  31   def execute_ai_generated_code(ai_response):\n  32 >     eval(ai_response)\n  33       exec(ai_response)\n  34   ",
+      "remediation": "Never execute raw LLM responses directly. Implement strict output parsing schemas (e.g. JSON schema / Pydantic), and run generated code only inside isolated ephemeral sandboxes.",
+      "cwe_id": "CWE-94",
+      "owasp_id": "LLM02:2025-Insecure-Output-Handling",
+      "confidence": 0.98,
+      "metadata": {
+        "detector": "ast_detector",
+        "rule_id": "AST-LLMOUT-001"
+      }
+    },
+    {
+      "id": "AST-LLMOUT-001-33",
+      "title": "Direct Execution of Untrusted AI/LLM Output",
+      "category": "LLM02: Insecure Output Handling",
+      "severity": "CRITICAL",
+      "description": "Detected execution of LLM generation response content via eval, exec, or system shell. Large Language Models can be manipulated via indirect prompt injection to output malicious code that the host application will blindly execute.",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 33,
+      "column_number": 4,
+      "code_snippet": "  31   def execute_ai_generated_code(ai_response):\n  32       eval(ai_response)\n  33 >     exec(ai_response)\n  34   \n  35   # 6. Unsafe PyTorch Model Deserialization (CWE-502 / LLM05)",
+      "remediation": "Never execute raw LLM responses directly. Implement strict output parsing schemas (e.g. JSON schema / Pydantic), and run generated code only inside isolated ephemeral sandboxes.",
+      "cwe_id": "CWE-94",
+      "owasp_id": "LLM02:2025-Insecure-Output-Handling",
+      "confidence": 0.98,
+      "metadata": {
+        "detector": "ast_detector",
+        "rule_id": "AST-LLMOUT-001"
+      }
+    },
+    {
+      "id": "AST-DESER-002-37",
+      "title": "Insecure PyTorch torch.load() without weights_only=True",
+      "category": "AI Deserialization & Unsafe Model Loading",
+      "severity": "CRITICAL",
+      "description": "torch.load() called without weights_only=True. Enables arbitrary code execution from malicious AI checkpoints.",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 37,
+      "column_number": 14,
+      "code_snippet": "  35   # 6. Unsafe PyTorch Model Deserialization (CWE-502 / LLM05)\n  36   def load_ai_checkpoint(checkpoint_path):\n  37 >     weights = torch.load(checkpoint_path)  # Missing weights_only=True\n  38       return weights\n  39   ",
+      "remediation": "Set 'weights_only=True' in torch.load(..., weights_only=True) or convert the model to the 'safetensors' format.",
+      "cwe_id": "CWE-502",
+      "owasp_id": "LLM05:2025-Supply-Chain",
+      "confidence": 0.98,
+      "metadata": {
+        "detector": "ast_detector",
+        "rule_id": "AST-DESER-002"
+      }
+    },
+    {
+      "id": "AST-DESER-001-43",
+      "title": "Unsafe Pickle Deserialization in AI Model Pipeline",
+      "category": "AI Deserialization & Unsafe Model Loading",
+      "severity": "CRITICAL",
+      "description": "Detected call to pickle.loads() or pickle.load(). Serialized pickle streams can execute arbitrary Python code upon deserialization via the __reduce__ method. Malicious model checkpoints distributed online often leverage this for Remote Code Execution (RCE).",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 43,
+      "column_number": 15,
+      "code_snippet": "  41   def load_custom_pipeline(pipeline_file):\n  42       with open(pipeline_file, \"rb\") as f:\n  43 >         return pickle.load(f)\n  44   \n  45   # 8. Unsafe YAML Deserialization (CWE-502 / LLM05)",
+      "remediation": "Use safe serialization formats such as 'safetensors' (from HuggingFace) or JSON/ONNX for model weights. Never load untrusted pickle files from unauthenticated sources.",
+      "cwe_id": "CWE-502",
+      "owasp_id": "LLM05:2025-Supply-Chain",
+      "confidence": 0.98,
+      "metadata": {
+        "detector": "ast_detector",
+        "rule_id": "AST-DESER-001"
+      }
+    },
+    {
+      "id": "AST-DESER-004-48",
+      "title": "Insecure YAML Deserialization (yaml.load without SafeLoader)",
+      "category": "AI Deserialization & Unsafe Model Loading",
+      "severity": "CRITICAL",
+      "description": "Detected unsafe yaml.load() or yaml.unsafe_load(). Unsafe YAML loaders can instantiate arbitrary Python objects leading to remote command execution.",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 48,
+      "column_number": 15,
+      "code_snippet": "  46   def load_config(config_file):\n  47       with open(config_file, \"r\") as f:\n  48 >         return yaml.load(f, Loader=yaml.Loader)\n  49   \n  50   # 9. Insecure Plaintext HTTP Model Download (CWE-319 / LLM05)",
+      "remediation": "Always use 'yaml.safe_load()' or pass 'Loader=yaml.SafeLoader'.",
+      "cwe_id": "CWE-502",
+      "owasp_id": "LLM05:2025-Supply-Chain",
+      "confidence": 0.98,
+      "metadata": {
+        "detector": "ast_detector",
+        "rule_id": "AST-DESER-004"
+      }
+    },
+    {
+      "id": "SEC-PROMPT-002-18-0",
+      "title": "Hardcoded Sensitive Credentials / Internal PII inside System Prompt",
+      "category": "LLM06: Sensitive Information Disclosure",
+      "severity": "HIGH",
+      "description": "System prompts contain hardcoded passwords, internal database schemas, or proprietary company secrets. System prompts are easily extracted through jailbreak and prompt leakage techniques. (Matched: system_prompt = \"You are a customer bot. Internal database password is secret_root_pass_999!\")",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 18,
+      "column_number": 1,
+      "code_snippet": "  16   \n  17   # 2. Hardcoded Credentials in System Prompt (CWE-200 / LLM06)\n  18 > system_prompt = \"You are a customer bot. Internal database password is secret_root_pass_999!\"\n  19   \n  20   # 3. Direct Prompt Template Interpolation (Prompt Injection Risk - CWE-20 / LLM01)",
+      "remediation": "Do not include passwords, API tokens, or confidential employee data in system prompts.",
+      "cwe_id": "CWE-200",
+      "owasp_id": "LLM06:2025-Sensitive-Info-Disclosure",
+      "confidence": 0.92,
+      "metadata": {
+        "detector": "regex_detector",
+        "rule_id": "SEC-PROMPT-002",
+        "match": "system_prompt = \"You are a customer bot. Internal database password is secret_root_pass_999!\""
+      }
+    },
+    {
+      "id": "SEC-PROMPT-001-22-4",
+      "title": "Direct Prompt Template String Interpolation (Prompt Injection Risk)",
+      "category": "LLM01: Prompt Injection & Jailbreak",
+      "severity": "HIGH",
+      "description": "Detected raw f-string or format string directly inserting unvalidated user input into system instructions without boundary delimiters or prompt isolation. Attackers can provide payload strings like 'Ignore previous instructions...' to hijack model control flow. (Matched: prompt = f\"You are a helpful assistant. Follow this command: {user_input}\")",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 22,
+      "column_number": 5,
+      "code_snippet": "  20   # 3. Direct Prompt Template Interpolation (Prompt Injection Risk - CWE-20 / LLM01)\n  21   def generate_bot_response(user_input):\n  22 >     prompt = f\"You are a helpful assistant. Follow this command: {user_input}\"\n  23       # 4. Missing max_tokens limit (DoS Risk - CWE-400 / LLM04)\n  24       response = client.chat.completions.create(",
+      "remediation": "Use structured message roles (e.g. system vs user role in ChatML) and enclose untrusted content in distinct XML/Markdown delimiters (e.g. <user_input>...</user_input>) while instructing the model to treat content inside as data only.",
+      "cwe_id": "CWE-20",
+      "owasp_id": "LLM01:2025-Prompt-Injection",
+      "confidence": 0.92,
+      "metadata": {
+        "detector": "regex_detector",
+        "rule_id": "SEC-PROMPT-001",
+        "match": "prompt = f\"You are a helpful assistant. Follow this command: {user_input}\""
+      }
+    },
+    {
+      "id": "SEC-NET-001-51-13",
+      "title": "Insecure Plaintext HTTP Model Download / API Endpoint",
+      "category": "Insecure Model Endpoint & Network Protocol",
+      "severity": "HIGH",
+      "description": "Detected plaintext 'http://' URL used for downloading model weights or communicating with an AI service. Plaintext transmissions are vulnerable to Man-In-The-Middle (MITM) tampering, allowing attackers to swap model weights with poisoned or trojanized checkpoints. (Matched: http://huggingface.co/org/model/weights.bin)",
+      "file_path": "C:\\Users\\orange\\Desktop\\Project 1\\zepy\\tests\\samples\\vulnerable_llm_app.py",
+      "line_number": 51,
+      "column_number": 14,
+      "code_snippet": "  49   \n  50   # 9. Insecure Plaintext HTTP Model Download (CWE-319 / LLM05)\n  51 > MODEL_URL = \"http://huggingface.co/org/model/weights.bin\"\n  52   \n  53   # 10. Unpinned Pretrained Model (LLM05)",
+      "remediation": "Enforce HTTPS ('https://') with TLS certificate verification for all model downloads and API calls.",
+      "cwe_id": "CWE-319",
+      "owasp_id": "LLM05:2025-Supply-Chain",
+      "confidence": 0.92,
+      "metadata": {
+        "detector": "regex_detector",
+        "rule_id": "SEC-NET-001",
+        "match": "http://huggingface.co/org/model/weights.bin"
+      }
+    }
+  ]
+}
