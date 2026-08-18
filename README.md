@@ -200,7 +200,7 @@ python main.py rules
 
 Launch the desktop interface with `python main.py gui`.
 
-<img src="assets/gui.png" alt="ZEPY AI Vulnerability Scanner Logo" width="240" style="border-radius: 16px; box-shadow: 0 8px 32px rgba(5, 217, 232, 0.3);" />
+<img src="assets/gui.png" alt="GUI" width="240"/>
 
 ---
 
