@@ -57,7 +57,7 @@ def print_banner(verbose: bool = True):
         styled_text.append(line + "\n", style=f"bold {color}")
     
     styled_text.append(ZEPY_SUB_BANNER, style="bold cyan")
-    
+
     panel = Panel(
         styled_text,
         box=box.DOUBLE_EDGE,

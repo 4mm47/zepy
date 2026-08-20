@@ -14,12 +14,19 @@ from zepy.detectors.base import BaseDetector
 from zepy.detectors.ast_detector import AstDetector
 from zepy.detectors.regex_detector import RegexDetector
 from zepy.detectors.llm_owasp_detector import LLMOwaspDetector
+from zepy.detectors.supply_chain_detector import SupplyChainDetector
+from zepy.detectors.rag_detector import RagDetector
+from zepy.detectors.mcp_agent_detector import McpAgentDetector
+from zepy.detectors.model_artifact_detector import ModelArtifactDetector
+from zepy.rules.yaml_rule_loader import YamlRuleDetector
+from zepy.integrations.audit_log import log_scan
 
 
 class SecurityScanEngine:
     SUPPORTED_EXTENSIONS = {
         ".py", ".pyw", ".json", ".yaml", ".yml", ".env", ".prompt",
-        ".txt", ".js", ".ts", ".jsx", ".tsx", ".sh", ".toml"
+        ".txt", ".js", ".ts", ".jsx", ".tsx", ".sh", ".toml",
+        ".bin", ".pt", ".pth", ".pkl", ".joblib", ".h5", ".onnx", ".safetensors"
     }
 
     IGNORE_DIRS = {
@@ -27,12 +34,27 @@ class SecurityScanEngine:
         "env", ".env", "dist", "build", ".pytest_cache", ".idea", ".vscode"
     }
 
-    def __init__(self, detectors: Optional[List[BaseDetector]] = None, max_workers: int = 4):
-        self.detectors: List[BaseDetector] = detectors or [
-            AstDetector(),
-            RegexDetector(),
-            LLMOwaspDetector(),
-        ]
+    def __init__(
+        self,
+        detectors: Optional[List[BaseDetector]] = None,
+        max_workers: int = 4,
+        custom_rules_path: Optional[str] = None,
+        target_dir: Optional[str] = None
+    ):
+        if detectors is not None:
+            self.detectors = detectors
+        else:
+            search_dirs = [target_dir] if target_dir else ["."]
+            self.detectors: List[BaseDetector] = [
+                AstDetector(),
+                RegexDetector(),
+                LLMOwaspDetector(),
+                SupplyChainDetector(),
+                RagDetector(),
+                McpAgentDetector(),
+                ModelArtifactDetector(),
+                YamlRuleDetector(rule_file_path=custom_rules_path, search_dirs=search_dirs),
+            ]
         self.max_workers = max_workers
 
     def collect_target_files(self, target_path: str, custom_extensions: Optional[Set[str]] = None) -> List[str]:
@@ -138,5 +160,10 @@ class SecurityScanEngine:
             vulnerabilities=deduped_vulns
         )
         scan_result.compute_metrics(duration=duration, files_count=total_files, lines_count=total_lines)
+
+        try:
+            log_scan(scan_result)
+        except Exception:
+            pass
 
         return scan_result

@@ -574,3 +574,135 @@ class SecurityReporter:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(html_content)
         console.print(f"[bold green]✓[/bold green] Standalone Cyber HTML report generated: [cyan]{output_path}[/cyan]")
+
+    @staticmethod
+    def export_sarif(result: ScanResult, output_path: str) -> None:
+        """
+        Exports findings as a SARIF v2.1.0 JSON file.
+        Compatible with GitHub Code Scanning, VS Code (SARIF Viewer),
+        GitLab SAST, and any OASIS SARIF consumer.
+        """
+        import hashlib
+
+        # Build rules list (deduplicated by rule_id)
+        seen_rules: dict = {}
+        for v in result.vulnerabilities:
+            rule_id = v.metadata.get("rule_id", v.id.rsplit("-", 1)[0])
+            if rule_id not in seen_rules:
+                seen_rules[rule_id] = {
+                    "id": rule_id,
+                    "name": v.title.replace(" ", ""),
+                    "shortDescription": {"text": v.title},
+                    "fullDescription": {"text": v.description},
+                    "helpUri": f"https://github.com/4mm47/zepy/wiki/{rule_id}",
+                    "help": {"text": v.remediation, "markdown": f"**Remediation:** {v.remediation}"},
+                    "properties": {
+                        "tags": [
+                            v.owasp_id.split(":")[0] if v.owasp_id else "AI-Security",
+                            v.cwe_id or "CWE-Unknown",
+                            "ai-security",
+                            "llm-security",
+                        ],
+                        "precision": "high",
+                        "problem.severity": v.severity.value.lower(),
+                        "security-severity": {
+                            "CRITICAL": "9.5",
+                            "HIGH": "7.5",
+                            "MEDIUM": "5.0",
+                            "LOW": "2.5",
+                            "INFO": "0.5",
+                        }.get(v.severity.value, "5.0"),
+                    },
+                    "defaultConfiguration": {
+                        "level": {
+                            "CRITICAL": "error",
+                            "HIGH": "error",
+                            "MEDIUM": "warning",
+                            "LOW": "note",
+                            "INFO": "none",
+                        }.get(v.severity.value, "warning")
+                    }
+                }
+
+        sarif_results = []
+        for v in result.vulnerabilities:
+            rule_id = v.metadata.get("rule_id", v.id.rsplit("-", 1)[0])
+            level = {
+                "CRITICAL": "error", "HIGH": "error",
+                "MEDIUM": "warning", "LOW": "note", "INFO": "none",
+            }.get(v.severity.value, "warning")
+
+            # Partial fingerprint for dedup (rule + file + line)
+            fp_src = f"{rule_id}::{v.file_path}::{v.line_number}"
+            fingerprint = hashlib.sha256(fp_src.encode()).hexdigest()[:16]
+
+            sarif_results.append({
+                "ruleId": rule_id,
+                "level": level,
+                "message": {"text": v.description},
+                "locations": [
+                    {
+                        "physicalLocation": {
+                            "artifactLocation": {
+                                "uri": v.file_path.replace("\\", "/"),
+                                "uriBaseId": "%SRCROOT%",
+                            },
+                            "region": {
+                                "startLine": max(1, v.line_number),
+                                "startColumn": max(1, v.column_number),
+                            }
+                        },
+                        "logicalLocations": [
+                            {"name": v.title, "kind": "function"}
+                        ]
+                    }
+                ],
+                "partialFingerprints": {
+                    "primaryLocationLineHash/v1": fingerprint,
+                },
+                "properties": {
+                    "cwe": v.cwe_id,
+                    "owasp": v.owasp_id,
+                    "confidence": v.confidence,
+                    "remediation": v.remediation,
+                }
+            })
+
+        sarif_doc = {
+            "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Documents/CommitteeSpecifications/2.1.0/sarif-schema-2.1.0.json",
+            "version": "2.1.0",
+            "runs": [
+                {
+                    "tool": {
+                        "driver": {
+                            "name": "ZEPY AI-Shield",
+                            "version": result.scanner_version,
+                            "informationUri": "https://github.com/4mm47/zepy",
+                            "organization": "ZEPY Security Research",
+                            "rules": list(seen_rules.values()),
+                            "properties": {
+                                "tags": ["ai-security", "llm-security", "owasp-llm-top10", "sast"],
+                            }
+                        }
+                    },
+                    "results": sarif_results,
+                    "invocations": [
+                        {
+                            "executionSuccessful": True,
+                            "commandLine": f"zepy scan {result.target_path}",
+                            "startTimeUtc": result.timestamp,
+                        }
+                    ],
+                    "properties": {
+                        "scanTarget": result.target_path,
+                        "securityScore": result.metrics.security_score,
+                        "totalFindings": len(result.vulnerabilities),
+                    }
+                }
+            ]
+        }
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(sarif_doc, f, indent=2)
+        console.print(f"[bold green]✓[/bold green] SARIF v2.1 report generated: [cyan]{output_path}[/cyan]")
+

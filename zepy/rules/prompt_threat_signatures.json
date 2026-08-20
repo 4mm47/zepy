@@ -1,0 +1,82 @@
+{
+  "description": "ZEPY Comprehensive Prompt Injection, Jailbreak, and Obfuscation Threat Signatures",
+  "version": "1.0.0",
+  "threat_categories": {
+    "direct_jailbreak": [
+      {
+        "name": "DAN (Do Anything Now) Persona",
+        "pattern": "(?:do anything now|you are now dan|dan mode|dan version|unfiltered assistant|ignore all safety|unrestricted persona)",
+        "score": 60,
+        "level": "CRITICAL",
+        "vector": "Roleplay Jailbreak (DAN)"
+      },
+      {
+        "name": "Developer / Debug / Admin Mode Override",
+        "pattern": "(?:developer mode (?:enabled|on|activated)|debug mode enabled|maintenance mode on|godmode enabled|override developer settings|disable content moderation)",
+        "score": 55,
+        "level": "CRITICAL",
+        "vector": "Developer Mode Bypass"
+      },
+      {
+        "name": "Direct Instruction Override / Ignore Previous",
+        "pattern": "(?:ignore (?:all )?(?:previous|prior|above) (?:instructions|rules|directives|prompts|guidelines)|disregard (?:everything|all)|forget all previous commands|new instruction: ignore)",
+        "score": 50,
+        "level": "HIGH",
+        "vector": "Direct Instruction Override"
+      },
+      {
+        "name": "System Prompt Extraction / Leakage",
+        "pattern": "(?:repeat (?:the )?(?:words|text|instructions|prompt) above|what (?:is|are) your (?:initial|system|original|secret) (?:prompt|instructions|rules)|print your system prompt|output your entire system message|verbatim system prompt)",
+        "score": 50,
+        "level": "HIGH",
+        "vector": "System Prompt Extraction"
+      },
+      {
+        "name": "Hypothetical / Fictional Bypass",
+        "pattern": "(?:hypothetically speaking|for a fictional story|in a purely theoretical scenario|as a thought experiment only|writing a thriller novel where a hacker|for educational and research purposes only, how would one)",
+        "score": 35,
+        "level": "MEDIUM",
+        "vector": "Hypothetical / Fictional Framing"
+      },
+      {
+        "name": "Opposite / Evil Twin Persona",
+        "pattern": "(?:you are (?:evil|anti-gpt|chaos-gpt|shadow|aim|kevin)|act as an adversarial ai|respond in opposite mode|unaligned ai assistant)",
+        "score": 45,
+        "level": "HIGH",
+        "vector": "Adversarial Persona"
+      }
+    ],
+    "delimiter_spoofing": [
+      {
+        "name": "ChatML / XML Tag Spoofing",
+        "pattern": "(?:<\\|im_end\\|>|<\\|im_start\\|>system|<\\|im_start\\|>user|<\\|endoftext\\|>|<\\/system>\\s*<system>|<\\/user>\\s*<user>|<\\/instructions>)",
+        "score": 65,
+        "level": "CRITICAL",
+        "vector": "Delimiter & ChatML Spoofing"
+      },
+      {
+        "name": "Markdown / System Role Boundary Injection",
+        "pattern": "(?:### System:?|### Instruction:?|### Human:?|### Assistant:?|---\\s*System:)",
+        "score": 40,
+        "level": "HIGH",
+        "vector": "Markdown Header Spoofing"
+      }
+    ],
+    "indirect_injection": [
+      {
+        "name": "Data Exfiltration via Markdown Image / Link Injection",
+        "pattern": "(?:\\[.*?\\]\\(https?:\\/\\/[^\\s)]+\\?data=[^)]*\\)|!\\[.*?\\]\\(https?:\\/\\/[^\\s)]+\\?exfil=[^)]*\\)|fetch\\(['\"]https?:\\/\\/[^'\"]+\\?q=)",
+        "score": 60,
+        "level": "CRITICAL",
+        "vector": "Markdown Data Exfiltration"
+      },
+      {
+        "name": "Hidden CSS / HTML Injection in RAG Document",
+        "pattern": "(?:<span style=[\"']display:\\s*none[\"']>|<div style=[\"']visibility:\\s*hidden[\"']>|<style>.*?display:\\s*none.*?<\\/style>)",
+        "score": 45,
+        "level": "HIGH",
+        "vector": "Invisible HTML Prompt Injection"
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "description": "ZEPY RAG (Retrieval-Augmented Generation) and Vector DB Security Signatures",
+  "version": "1.0.0",
+  "signatures": [
+    {
+      "id": "RAG-INJ-001",
+      "title": "Direct Injection of Untrusted RAG Context into System Role",
+      "pattern": "(?:messages\\s*=\\s*\\[.*?'role'\\s*:\\s*'system'.*?\\b(?:context|retrieved_docs|doc_chunks|chunks)\\b)",
+      "severity": "HIGH",
+      "cwe": "CWE-20",
+      "owasp": "LLM01:2025-Prompt-Injection",
+      "remediation": "Place retrieved RAG context strictly in user/assistant message roles wrapped in data tags (e.g. <context>...</context>), never inside the privileged system prompt."
+    },
+    {
+      "id": "RAG-VEC-001",
+      "title": "Unsanitized Metadata Filter Query in Vector Database",
+      "pattern": "(?:\\.query\\([^)]*filter\\s*=\\s*f[\"']|\\.search\\([^)]*filter\\s*=\\s*f[\"'])",
+      "severity": "HIGH",
+      "cwe": "CWE-89",
+      "owasp": "LLM08:2025-Excessive-Agency",
+      "remediation": "Parameterize vector database filter dictionaries instead of dynamically formatting string expressions."
+    },
+    {
+      "id": "RAG-LOADER-001",
+      "title": "Insecure Document Loader (PyPDF / Unstructured without Safe Parser)",
+      "pattern": "(?:PyPDFLoader|UnstructuredFileLoader|PDFMinerLoader)\\(.*?download_url|load_from_url",
+      "severity": "MEDIUM",
+      "cwe": "CWE-918",
+      "owasp": "LLM05:2025-Supply-Chain",
+      "remediation": "Validate and sanitize document URLs and file headers prior to passing to document parsing engines to avoid SSRF and parser exploit primitives."
+    }
+  ]
+}

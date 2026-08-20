@@ -61,9 +61,9 @@ class ZepyMainWindow(QMainWindow):
 
         # Right Meta Status
         status_box = QVBoxLayout()
-        lbl_engine_status = QLabel("● ENGINE ACTIVE")
+        lbl_engine_status = QLabel("● ENGINE ACTIVE (100% Offline)")
         lbl_engine_status.setStyleSheet("color: #01FFC3; font-weight: bold; font-size: 11px;")
-        lbl_rule_count = QLabel(f"OWASP Top 10 for LLMs • {len(RULES_DATABASE)}+ Security Rules")
+        lbl_rule_count = QLabel(f"OWASP Top 10 for LLMs • {len(RULES_DATABASE)}+ Security Rules • Zero API Keys")
         lbl_rule_count.setStyleSheet("color: #94A3B8; font-size: 11px;")
         status_box.addWidget(lbl_engine_status, alignment=Qt.AlignRight)
         status_box.addWidget(lbl_rule_count, alignment=Qt.AlignRight)

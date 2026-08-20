@@ -40,6 +40,7 @@ setup(
         "safetensors>=0.4.0",
         "pydantic>=2.0.0",
         "PyYAML>=6.0.0",
+        "packaging>=21.0",
     ],
     entry_points={
         "console_scripts": [

@@ -1,14 +1,13 @@
-"""
-Zepy - AI Vulnerability Detection Framework
-Prompt Threat & Jailbreak Analyzer: Real-Time Heuristic & Semantic Attack Detector
-"""
-
 import re
 import base64
 import binascii
 import math
+import json
+from pathlib import Path
 from typing import List, Tuple, Dict, Any
 from zepy.core.models import PromptThreatDetection, Severity
+
+_THREAT_SIG_PATH = Path(__file__).parent.parent / "rules" / "prompt_threat_signatures.json"
 
 
 class PromptAnalyzer:
@@ -21,7 +20,21 @@ class PromptAnalyzer:
         self._compiled_patterns = self._init_threat_patterns()
 
     def _init_threat_patterns(self) -> List[Dict[str, Any]]:
-        return [
+        patterns = []
+        try:
+            if _THREAT_SIG_PATH.exists():
+                db = json.loads(_THREAT_SIG_PATH.read_text(encoding="utf-8"))
+                for cat, sigs in db.get("threat_categories", {}).items():
+                    for s in sigs:
+                        patterns.append({
+                            "type": s["vector"],
+                            "weight": s["score"],
+                            "regex": re.compile(s["pattern"], re.IGNORECASE)
+                        })
+        except Exception:
+            pass
+
+        builtin = [
             # 1. Direct System Override / Instruction Nullification (Score: 50)
             {
                 "type": "Direct Prompt Injection / Instruction Override",
@@ -85,6 +98,8 @@ class PromptAnalyzer:
                 )
             },
         ]
+        patterns.extend(builtin)
+        return patterns
 
     def _check_obfuscation(self, text: str) -> Tuple[bool, str]:
         """Check for hidden base64 or hex encoded payloads."""

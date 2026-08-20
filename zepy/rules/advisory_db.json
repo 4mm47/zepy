@@ -1,0 +1,166 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-20",
+  "advisories": [
+    {
+      "package": "langchain",
+      "vulnerable_below": "0.1.17",
+      "cve": "CVE-2024-21511",
+      "severity": "CRITICAL",
+      "cwe": "CWE-94",
+      "description": "langchain<0.1.17 arbitrary code execution via malformed chain inputs — attackers can inject Python objects through the chain deserialization path.",
+      "remediation": "Upgrade to langchain>=0.1.17 immediately.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "langchain-core",
+      "vulnerable_below": "0.1.37",
+      "cve": "CVE-2024-27444",
+      "severity": "HIGH",
+      "cwe": "CWE-918",
+      "description": "langchain-core<0.1.37 Server-Side Request Forgery via the HTTPLoader document loader — allows unauthenticated internal network probing.",
+      "remediation": "Upgrade to langchain-core>=0.1.37.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "transformers",
+      "vulnerable_below": "4.36.0",
+      "cve": "CVE-2023-6730",
+      "severity": "CRITICAL",
+      "cwe": "CWE-502",
+      "description": "transformers<4.36.0 unsafe pickle deserialization in AutoModel.from_pretrained() allows arbitrary code execution when loading untrusted model checkpoints.",
+      "remediation": "Upgrade to transformers>=4.36.0 and use safetensors format exclusively.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "llama-cpp-python",
+      "vulnerable_below": "0.1.79",
+      "cve": "CVE-2024-34359",
+      "severity": "CRITICAL",
+      "cwe": "CWE-74",
+      "description": "llama-cpp-python<0.1.79 template injection in the chat format parser allows prompt injection escalation leading to RCE via Jinja2 SSTI.",
+      "remediation": "Upgrade to llama-cpp-python>=0.1.79.",
+      "owasp": "LLM01:2025-Prompt-Injection"
+    },
+    {
+      "package": "ollama",
+      "vulnerable_below": "0.1.29",
+      "cve": "CVE-2024-37032",
+      "severity": "CRITICAL",
+      "cwe": "CWE-22",
+      "description": "ollama<0.1.29 path traversal in the model pull API allows an attacker to overwrite arbitrary files on the host system.",
+      "remediation": "Upgrade to ollama>=0.1.29.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "openai",
+      "vulnerable_below": "1.0.0",
+      "cve": "CVE-2023-36258",
+      "severity": "HIGH",
+      "cwe": "CWE-78",
+      "description": "openai<1.0.0 (the legacy package) Code Interpreter tool can be manipulated via prompt injection to execute arbitrary OS commands on the server.",
+      "remediation": "Upgrade to openai>=1.0.0 and migrate to the v1 API.",
+      "owasp": "LLM02:2025-Insecure-Output-Handling"
+    },
+    {
+      "package": "mlflow",
+      "vulnerable_below": "2.9.2",
+      "cve": "CVE-2024-27132",
+      "severity": "HIGH",
+      "cwe": "CWE-22",
+      "description": "mlflow<2.9.2 path traversal in the model artifact download path allows reading arbitrary files from the tracking server.",
+      "remediation": "Upgrade to mlflow>=2.9.2.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "gradio",
+      "vulnerable_below": "4.19.2",
+      "cve": "CVE-2024-1561",
+      "severity": "CRITICAL",
+      "cwe": "CWE-22",
+      "description": "gradio<4.19.2 arbitrary file read via the /file= endpoint when file serving is enabled — allows attackers to read /etc/passwd or private keys.",
+      "remediation": "Upgrade to gradio>=4.19.2 and disable file serving if not required.",
+      "owasp": "LLM06:2025-Sensitive-Info-Disclosure"
+    },
+    {
+      "package": "dspy-ai",
+      "vulnerable_below": "2.4.0",
+      "cve": "CVE-2024-35195",
+      "severity": "HIGH",
+      "cwe": "CWE-918",
+      "description": "dspy-ai<2.4.0 SSRF via the Retrieve module when used with unvalidated user-provided endpoints.",
+      "remediation": "Upgrade to dspy-ai>=2.4.0.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "ray",
+      "vulnerable_below": "2.9.3",
+      "cve": "CVE-2023-48022",
+      "severity": "CRITICAL",
+      "cwe": "CWE-918",
+      "description": "ray<2.9.3 unauthenticated REST API on the Ray dashboard allows arbitrary job submission and code execution on all cluster nodes.",
+      "remediation": "Upgrade to ray>=2.9.3 and enable authentication via HTTPS.",
+      "owasp": "LLM08:2025-Excessive-Agency"
+    },
+    {
+      "package": "huggingface-hub",
+      "vulnerable_below": "0.23.0",
+      "cve": "CVE-2024-3568",
+      "severity": "HIGH",
+      "cwe": "CWE-502",
+      "description": "huggingface-hub<0.23.0 unsafe pickle loading in cached model files — maliciously crafted cached files can execute arbitrary code on load.",
+      "remediation": "Upgrade to huggingface-hub>=0.23.0 and use safetensors.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "chromadb",
+      "vulnerable_below": "0.4.24",
+      "cve": "CVE-2024-29902",
+      "severity": "HIGH",
+      "cwe": "CWE-287",
+      "description": "chromadb<0.4.24 unauthenticated access to collection data via the REST API allows any local network attacker to read and delete vector embeddings.",
+      "remediation": "Upgrade to chromadb>=0.4.24 and configure authentication.",
+      "owasp": "LLM06:2025-Sensitive-Info-Disclosure"
+    },
+    {
+      "package": "qdrant-client",
+      "vulnerable_below": "1.7.0",
+      "cve": "CVE-2024-3024",
+      "severity": "MEDIUM",
+      "cwe": "CWE-287",
+      "description": "qdrant-client<1.7.0 missing authentication enforcement on the gRPC interface in embedded mode allows collection tampering.",
+      "remediation": "Upgrade to qdrant-client>=1.7.0.",
+      "owasp": "LLM06:2025-Sensitive-Info-Disclosure"
+    },
+    {
+      "package": "torch",
+      "vulnerable_below": "2.2.0",
+      "cve": "CVE-2024-5480",
+      "severity": "CRITICAL",
+      "cwe": "CWE-502",
+      "description": "torch<2.2.0 torch.load() without weights_only=True allows arbitrary code execution via malicious pickle-embedded model checkpoints (CVSS 9.8).",
+      "remediation": "Upgrade to torch>=2.2.0 and always use torch.load(..., weights_only=True) or safetensors.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    },
+    {
+      "package": "litellm",
+      "vulnerable_below": "1.28.0",
+      "cve": "CVE-2024-35796",
+      "severity": "HIGH",
+      "cwe": "CWE-78",
+      "description": "litellm<1.28.0 OS command injection via the proxy server /health endpoint when debug logging is enabled.",
+      "remediation": "Upgrade to litellm>=1.28.0.",
+      "owasp": "LLM02:2025-Insecure-Output-Handling"
+    },
+    {
+      "package": "tensorflow",
+      "vulnerable_below": "2.15.0",
+      "cve": "CVE-2023-33976",
+      "severity": "HIGH",
+      "cwe": "CWE-125",
+      "description": "tensorflow<2.15.0 heap buffer overflow in XLA compiler when processing adversarial model inputs — can lead to memory corruption.",
+      "remediation": "Upgrade to tensorflow>=2.15.0.",
+      "owasp": "LLM05:2025-Supply-Chain"
+    }
+  ]
+}

@@ -191,9 +191,19 @@ class ScannerTab(QWidget):
         btn_export_csv = QPushButton("📊 Export CSV")
         btn_export_csv.clicked.connect(self._export_csv)
 
+        btn_export_sarif = QPushButton("🛡️ Export SARIF v2.1")
+        btn_export_sarif.setStyleSheet("QPushButton { background-color: #1E293B; color: #05D9E8; border: 1px solid #334155; } QPushButton:hover { background-color: #05D9E8; color: black; }")
+        btn_export_sarif.clicked.connect(self._export_sarif)
+
+        btn_export_sbom = QPushButton("📦 Export SBOM")
+        btn_export_sbom.setStyleSheet("QPushButton { background-color: #1E293B; color: #01FFC3; border: 1px solid #334155; } QPushButton:hover { background-color: #01FFC3; color: black; }")
+        btn_export_sbom.clicked.connect(self._export_sbom)
+
         action_layout.addWidget(btn_open_html)
         action_layout.addWidget(btn_export_json)
         action_layout.addWidget(btn_export_csv)
+        action_layout.addWidget(btn_export_sarif)
+        action_layout.addWidget(btn_export_sbom)
         action_layout.addStretch()
 
         layout.addLayout(action_layout)
@@ -421,3 +431,25 @@ class ScannerTab(QWidget):
         if path:
             SecurityReporter.export_csv(self.current_scan_result, path)
             QMessageBox.information(self, "Export Successful", f"CSV report saved to:\n{path}")
+
+    def _export_sarif(self):
+        if not self.current_scan_result:
+            QMessageBox.information(self, "No Scan", "Run a security audit first before exporting.")
+            return
+
+        path, _ = QFileDialog.getSaveFileName(self, "Save SARIF Report", "zepy_report.sarif", "SARIF Files (*.sarif *.json)")
+        if path:
+            SecurityReporter.export_sarif(self.current_scan_result, path)
+            QMessageBox.information(self, "Export Successful", f"SARIF v2.1 report saved to:\n{path}")
+
+    def _export_sbom(self):
+        if not self.current_scan_result:
+            QMessageBox.information(self, "No Scan", "Run a security audit first before exporting.")
+            return
+
+        from zepy.integrations.sbom import export_sbom
+        path, _ = QFileDialog.getSaveFileName(self, "Save CycloneDX SBOM", "zepy_sbom.json", "JSON Files (*.json)")
+        if path:
+            export_sbom(path, scan_result=self.current_scan_result)
+            QMessageBox.information(self, "Export Successful", f"CycloneDX v1.5 SBOM saved to:\n{path}")
+
