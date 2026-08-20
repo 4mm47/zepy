@@ -2,16 +2,6 @@
 
 <img src="assets/zepy_logo.jpg" alt="ZEPY AI Vulnerability Scanner Logo" width="240" style="border-radius: 16px; box-shadow: 0 8px 32px rgba(5, 217, 232, 0.3);" />
 
-```ascii
-███████╗███████╗██████╗ ██╗   ██╗
-╚══███╔╝██╔════╝██╔══██╗╚██╗ ██╔╝
-  ███╔╝ █████╗  ██████╔╝ ╚████╔╝ 
- ███╔╝  ██╔══╝  ██╔═══╝   ╚██╔╝  
-███████╗███████╗██║        ██║   
-╚══════╝╚══════╝╚═╝        ╚═╝   
-  [+] Z E P Y  A I - S H I E L D  v 1 . 0 . 0
-```
-
 # ⚡ ZEPY — Advanced AI & LLM Vulnerability Detection System
 ### *Comprehensive Static Security Testing (SAST), Model Checkpoint & Prompt Threat Platform*
 
